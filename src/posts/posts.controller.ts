@@ -24,7 +24,7 @@ export class PostsController {
     // Get Post
     @Get(':id')
     getPost(@Param('id') id: string): Promise<PostModel> {
-        return this.postsService.getPost(+id);
+        return this.postsService.getPostId(+id);
     }
 
     // Post
@@ -36,7 +36,7 @@ export class PostsController {
     @Put(':id')
     PatchPost(
         @Param('id') id: string,
-        @Body() body: Partial<postBody>,
+        @Body() body: Omit<postBody, 'authorId'>,
     ): Promise<PostModel> {
         return this.postsService.updatePost(+id, body);
     }

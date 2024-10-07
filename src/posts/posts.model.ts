@@ -1,1 +1,1 @@
-export type postBody = { author: string; title: string; content: string };
+export type postBody = { authorId: number; title: string; content: string };
