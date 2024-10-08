@@ -4,7 +4,7 @@ import {
     UnauthorizedException,
 } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
-import { JWT_SECERT } from 'src/auth/const/auth.const';
+import { HASH_ROUND, JWT_SECERT } from 'src/auth/const/auth.const';
 import { UsersModel } from 'src/users/entities/users.entity';
 import { UsersService } from 'src/users/users.service';
 import * as bcrypt from 'bcrypt';
@@ -43,7 +43,7 @@ export class AuthService {
         const payload = {
             email: user.email,
             sub: user.id,
-            type: isRefreshToken ? 'refrsh' : 'access',
+            type: isRefreshToken ? 'refresh' : 'access',
         };
 
         return this.jwtService.sign(payload, {
@@ -59,6 +59,7 @@ export class AuthService {
         };
     }
 
+    //검증
     async authenticateWithEmailAndPassword(
         user: Pick<UsersModel, 'email' | 'password'>,
     ) {
@@ -75,5 +76,71 @@ export class AuthService {
 
         if (!matchPassword)
             throw new UnauthorizedException('비밀번호가 일치 하지 않습니다.');
+
+        return existingUser;
+    }
+
+    async loginWithEmail(user: Pick<UsersModel, 'email' | 'password'>) {
+        const existingUser = await this.authenticateWithEmailAndPassword(user);
+        return this.loginUser(existingUser);
+    }
+
+    //회원가입
+    async registerWithEmail(
+        user: Pick<UsersModel, 'email' | 'password' | 'nickname'>,
+    ) {
+        const { password } = user;
+        const hashPassword = await bcrypt.hash(password, HASH_ROUND);
+
+        const newUser = await this.userService.createUser({
+            ...user,
+            password: hashPassword,
+        });
+
+        return this.loginUser(newUser);
+    }
+
+    //token extract
+    extractTokenFromHeader(header: string, isBearer: Boolean) {
+        const splitToken = header.split(' ');
+        const prefix = isBearer ? 'Bearer' : 'Basic';
+
+        if (splitToken[0] !== prefix && splitToken.length !== 2) {
+            throw new UnauthorizedException('token error');
+        }
+        return splitToken[1];
+    }
+
+    decodeBasicToken(basicToken: string) {
+        const decode = Buffer.from(basicToken, 'base64').toString('utf-8');
+        const splitString = decode.split(':');
+
+        if (splitString.length !== 2)
+            throw new UnauthorizedException('잘못된 토큰 유형입니다');
+
+        const [email, password] = splitString;
+        return {
+            email,
+            password,
+        };
+    }
+
+    //검증
+    verifyToken(token: string) {
+        try {
+            return this.jwtService.verify(token, { secret: JWT_SECERT });
+        } catch (error) {
+            throw new UnauthorizedException('비정상적인 토큰입니다.');
+        }
+    }
+
+    //토큰 재발급
+    rotateToken(token: string, isRefreshToken: boolean) {
+        const decoded = this.verifyToken(token);
+        console.log(decoded);
+        if (decoded.type !== 'refresh') {
+            throw new UnauthorizedException();
+        }
+        return this.signToken({ ...decoded }, isRefreshToken);
     }
 }

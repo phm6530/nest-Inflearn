@@ -4,6 +4,7 @@ import {
     Delete,
     Get,
     Param,
+    ParseIntPipe,
     Post,
     Put,
 } from '@nestjs/common';
@@ -23,8 +24,8 @@ export class PostsController {
 
     // Get Post
     @Get(':id')
-    getPost(@Param('id') id: string): Promise<PostModel> {
-        return this.postsService.getPostId(+id);
+    getPost(@Param('id', ParseIntPipe) id: number): Promise<PostModel> {
+        return this.postsService.getPostId(id);
     }
 
     // Post
@@ -42,7 +43,7 @@ export class PostsController {
     }
 
     @Delete(':id')
-    deletePost(@Param('id') id: string): Promise<number> {
+    deletePost(@Param('id', ParseIntPipe) id: number): Promise<number> {
         return this.postsService.deletePost(+id);
     }
 }
