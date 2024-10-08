@@ -6,6 +6,7 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import { PostModel } from 'src/posts/entities/posts.entity';
 import { UsersModule } from './users/users.module';
 import { UsersModel } from 'src/users/entities/users.entity';
+import { AuthModule } from './auth/auth.module';
 
 @Module({
     imports: [
@@ -21,6 +22,7 @@ import { UsersModel } from 'src/users/entities/users.entity';
             synchronize: true,
         }),
         UsersModule,
+        AuthModule,
     ],
     controllers: [AppController],
     providers: [AppService],

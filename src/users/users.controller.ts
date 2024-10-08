@@ -1,6 +1,5 @@
 import { Body, Controller, Get, Post } from '@nestjs/common';
 import { UsersService } from './users.service';
-import { UsersModel } from 'src/users/entities/users.entity';
 
 export class CreateUserDto {
     nickname: string;

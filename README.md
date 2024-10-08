@@ -87,4 +87,7 @@ Nest is [MIT licensed](https://github.com/nestjs/nest/blob/master/LICENSE).
 ```bash
 npm i @nestjs/typeorm typeorm pg
 nest g resource users
+npm i @nestjs/jwt
+npm i bcrypt
+npm i --save-dev @types/bcrypt
 ```
