@@ -90,4 +90,6 @@ nest g resource users
 npm i @nestjs/jwt
 npm i bcrypt
 npm i --save-dev @types/bcrypt
+npm install class-validator class-transformer
+
 ```

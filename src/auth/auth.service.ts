@@ -8,6 +8,7 @@ import { HASH_ROUND, JWT_SECERT } from 'src/auth/const/auth.const';
 import { UsersModel } from 'src/users/entities/users.entity';
 import { UsersService } from 'src/users/users.service';
 import * as bcrypt from 'bcrypt';
+import { RegisterUserDto } from 'src/auth/dto/auth-register.dto';
 
 @Injectable()
 export class AuthService {
@@ -86,9 +87,7 @@ export class AuthService {
     }
 
     //회원가입
-    async registerWithEmail(
-        user: Pick<UsersModel, 'email' | 'password' | 'nickname'>,
-    ) {
+    async registerWithEmail(user: RegisterUserDto) {
         const { password } = user;
         const hashPassword = await bcrypt.hash(password, HASH_ROUND);
 

@@ -4,6 +4,7 @@ import {
     NotFoundException,
 } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
+import { CreatePostDto } from 'src/posts/dto/create-post.dto';
 import { PostModel } from 'src/posts/entities/posts.entity';
 import { postBody } from 'src/posts/posts.model';
 import { Repository } from 'typeorm';
@@ -32,7 +33,7 @@ export class PostsService {
         return post;
     }
 
-    async createPost(body: postBody) {
+    async createPost(body: { authorId: number } & CreatePostDto) {
         const { authorId, title, content } = body;
 
         if (!authorId || !title || !content)

@@ -6,6 +6,7 @@ import {
     AccessTokenGuard,
     RefreshTokenGaurd,
 } from 'src/auth/guard/bearer-token.guard';
+import { RegisterUserDto } from 'src/auth/dto/auth-register.dto';
 
 @Controller('auth')
 export class AuthController {
@@ -58,15 +59,7 @@ export class AuthController {
 
     //회원가입
     @Post('login/register')
-    registerEmail(
-        @Body('email') email: string,
-        @Body('nickname') nickname: string,
-        @Body('password', PasswordPipe) password: string,
-    ) {
-        return this.authService.registerWithEmail({
-            email,
-            nickname,
-            password,
-        });
+    registerEmail(@Body() body: RegisterUserDto) {
+        return this.authService.registerWithEmail(body);
     }
 }
