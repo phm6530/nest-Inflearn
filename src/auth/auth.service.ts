@@ -3,7 +3,7 @@ import {
     NotFoundException,
     UnauthorizedException,
 } from '@nestjs/common';
-import { JwtService } from '@nestjs/jwt';
+import { JsonWebTokenError, JwtService, TokenExpiredError } from '@nestjs/jwt';
 import { HASH_ROUND, JWT_SECERT } from 'src/auth/const/auth.const';
 import { UsersModel } from 'src/users/entities/users.entity';
 import { UsersService } from 'src/users/users.service';
@@ -130,16 +130,25 @@ export class AuthService {
         try {
             return this.jwtService.verify(token, { secret: JWT_SECERT });
         } catch (error) {
-            throw new UnauthorizedException('비정상적인 토큰입니다.');
+            if (error instanceof TokenExpiredError) {
+                throw new UnauthorizedException('토큰이 만료되었습니다.');
+            } else if (error instanceof JsonWebTokenError) {
+                throw new UnauthorizedException('비정상적인 토큰입니다.');
+            } else {
+                throw new UnauthorizedException(
+                    '토큰 검증 중 오류가 발생했습니다.',
+                );
+            }
         }
     }
 
     //토큰 재발급
     rotateToken(token: string, isRefreshToken: boolean) {
         const decoded = this.verifyToken(token);
-        console.log(decoded);
         if (decoded.type !== 'refresh') {
-            throw new UnauthorizedException();
+            throw new UnauthorizedException(
+                'Access Token으로는 발급이 불가합니다.',
+            );
         }
         return this.signToken({ ...decoded }, isRefreshToken);
     }

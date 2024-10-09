@@ -1,11 +1,14 @@
+import { BaseModel } from 'src/common/entity/base.entity';
 import { PostModel } from 'src/posts/entities/posts.entity';
 import { RoleEnum } from 'src/users/const/roles.const';
 import {
     Column,
+    CreateDateColumn,
     Entity,
     ManyToOne,
     OneToMany,
     PrimaryGeneratedColumn,
+    UpdateDateColumn,
 } from 'typeorm';
 /**
  * id number
@@ -16,10 +19,7 @@ import {
  */
 
 @Entity()
-export class UsersModel {
-    @PrimaryGeneratedColumn()
-    id: number;
-
+export class UsersModel extends BaseModel {
     //닉네임
     @Column({ unique: true, length: 20 })
     nickname: string;

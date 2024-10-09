@@ -1,5 +1,11 @@
-import { Body, Controller, Header, Headers, Post } from '@nestjs/common';
+import { Body, Controller, Headers, Post, UseGuards } from '@nestjs/common';
 import { AuthService } from './auth.service';
+import { PasswordPipe } from 'src/auth/pipe/password.pipe';
+import { BasicGaurd } from 'src/auth/guard/basic-token.guard';
+import {
+    AccessTokenGuard,
+    RefreshTokenGaurd,
+} from 'src/auth/guard/bearer-token.guard';
 
 @Controller('auth')
 export class AuthController {
@@ -7,6 +13,7 @@ export class AuthController {
 
     //access Token 생성
     @Post('token/access')
+    @UseGuards(RefreshTokenGaurd)
     postTokenAccess(@Headers('authorization') rawToken: string) {
         const token = this.authService.extractTokenFromHeader(rawToken, true);
         const newAccessToken = this.authService.rotateToken(token, false);
@@ -22,6 +29,7 @@ export class AuthController {
     }
 
     @Post('token/refresh')
+    @UseGuards(RefreshTokenGaurd)
     postTokenRefresh(@Headers('authorization') rawToken: string) {
         const token = this.authService.extractTokenFromHeader(rawToken, true);
         const newRefreshToken = this.authService.rotateToken(token, true);
@@ -37,6 +45,7 @@ export class AuthController {
 
     //로그인
     @Post('login/email')
+    @UseGuards(BasicGaurd)
     loginEmail(
         @Headers('authorization') rawToken: string,
         // @Body('email') email: string,
@@ -52,7 +61,7 @@ export class AuthController {
     registerEmail(
         @Body('email') email: string,
         @Body('nickname') nickname: string,
-        @Body('password') password: string,
+        @Body('password', PasswordPipe) password: string,
     ) {
         return this.authService.registerWithEmail({
             email,

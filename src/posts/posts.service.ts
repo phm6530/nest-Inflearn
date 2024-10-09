@@ -1,4 +1,8 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import {
+    BadRequestException,
+    Injectable,
+    NotFoundException,
+} from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { PostModel } from 'src/posts/entities/posts.entity';
 import { postBody } from 'src/posts/posts.model';
@@ -30,6 +34,9 @@ export class PostsService {
 
     async createPost(body: postBody) {
         const { authorId, title, content } = body;
+
+        if (!authorId || !title || !content)
+            throw new BadRequestException('누락된 값이 있습니다.');
 
         const post = this.postRepository.create({
             author: {
