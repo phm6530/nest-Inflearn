@@ -1,4 +1,9 @@
-import { Controller, Get } from '@nestjs/common';
+import {
+    ClassSerializerInterceptor,
+    Controller,
+    Get,
+    UseInterceptors,
+} from '@nestjs/common';
 import { UsersService } from './users.service';
 
 export class CreateUserDto {
@@ -11,6 +16,12 @@ export class CreateUserDto {
 export class UsersController {
     constructor(private readonly usersService: UsersService) {}
 
+    /**
+     *
+     * Serializer 직렬화
+     * Request
+     *
+     */
     @Get()
     getUsers() {
         return this.usersService.getUsers();

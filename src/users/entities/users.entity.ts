@@ -1,16 +1,8 @@
-import { IsEmail, IsString, Length } from 'class-validator';
+import { Exclude } from 'class-transformer';
 import { BaseModel } from 'src/common/entity/base.entity';
 import { PostModel } from 'src/posts/entities/posts.entity';
 import { RoleEnum } from 'src/users/const/roles.const';
-import {
-    Column,
-    CreateDateColumn,
-    Entity,
-    ManyToOne,
-    OneToMany,
-    PrimaryGeneratedColumn,
-    UpdateDateColumn,
-} from 'typeorm';
+import { Column, Entity, OneToMany } from 'typeorm';
 /**
  * id number
  * nickname : string
@@ -23,17 +15,27 @@ import {
 export class UsersModel extends BaseModel {
     //닉네임
     @Column({ unique: true, length: 20 })
-    @Length(1, 20, { message: '길이 1~20 허용' })
     nickname: string;
 
     //이메일
     @Column({ unique: true })
-    @IsEmail({}, { message: '이메일 형식이 틀렸습니다.' })
     email: string;
 
     //Password
+    /**
+     * Exclude는 제외시킴,
+     *
+     * request (클라이언트 -> 서버)
+     * 직렬화 -> 클래스 인스턴스로 변환할 때(password 입력 필요),
+     * 즉 요청 시에는 허용해야 하므로 toClassOnly: true 사용.
+     *
+     * response (서버 -> 클라이언트)
+     * 객체를 JSON으로 직렬화할 때는 password를 제외해야 하므로
+     * toPlainOnly: true로 설정하여 응답 시에 제외.
+     */
+
     @Column()
-    @IsString()
+    @Exclude({ toPlainOnly: true })
     password: string;
 
     //기본값 User
