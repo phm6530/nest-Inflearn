@@ -1,20 +1,18 @@
-import {
-    Injectable,
-    NotFoundException,
-    UnauthorizedException,
-} from '@nestjs/common';
+import { Injectable, UnauthorizedException } from '@nestjs/common';
 import { JsonWebTokenError, JwtService, TokenExpiredError } from '@nestjs/jwt';
-import { HASH_ROUND, JWT_SECERT } from 'src/auth/const/auth.const';
 import { UsersModel } from 'src/users/entities/users.entity';
 import { UsersService } from 'src/users/users.service';
 import * as bcrypt from 'bcrypt';
 import { RegisterUserDto } from 'src/auth/dto/auth-register.dto';
+import { ConfigService } from '@nestjs/config';
+import { ENV_JWT_SELECT, ENV_HASH_ROUND } from 'src/env-keys.const';
 
 @Injectable()
 export class AuthService {
     constructor(
         private readonly userService: UsersService,
         private readonly jwtService: JwtService,
+        private readonly configService: ConfigService, //env
     ) {}
 
     /**
@@ -48,7 +46,7 @@ export class AuthService {
         };
 
         return this.jwtService.sign(payload, {
-            secret: JWT_SECERT,
+            secret: this.configService.get<string>(ENV_JWT_SELECT),
             expiresIn: isRefreshToken ? 3600 : 300,
         });
     }
@@ -89,7 +87,10 @@ export class AuthService {
     //회원가입
     async registerWithEmail(user: RegisterUserDto) {
         const { password } = user;
-        const hashPassword = await bcrypt.hash(password, HASH_ROUND);
+        const hashPassword = await bcrypt.hash(
+            password,
+            this.configService.get<string>(ENV_HASH_ROUND),
+        );
 
         const newUser = await this.userService.createUser({
             ...user,
@@ -127,7 +128,9 @@ export class AuthService {
     //검증
     verifyToken(token: string) {
         try {
-            return this.jwtService.verify(token, { secret: JWT_SECERT });
+            return this.jwtService.verify(token, {
+                secret: this.configService.get<string>(ENV_JWT_SELECT),
+            });
         } catch (error) {
             if (error instanceof TokenExpiredError) {
                 throw new UnauthorizedException('토큰이 만료되었습니다.');
