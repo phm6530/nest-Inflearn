@@ -47,7 +47,14 @@ export class PostsController {
     // Post
     @Post()
     @UseGuards(AccessTokenGuard)
-    postPosts(@User('nickname') user: UsersModel, @Body() body: CreatePostDto) {
+    async postPosts(
+        @User('nickname') user: UsersModel,
+        @Body() body: CreatePostDto,
+    ) {
+        await this.postsService.createPostImage({
+            ...body,
+        });
+
         return this.postsService.createPost({
             authorId: user.id,
             ...body,

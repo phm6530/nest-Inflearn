@@ -1,11 +1,7 @@
 import { Body, Controller, Headers, Post, UseGuards } from '@nestjs/common';
 import { AuthService } from './auth.service';
-import { PasswordPipe } from 'src/auth/pipe/password.pipe';
 import { BasicGaurd } from 'src/auth/guard/basic-token.guard';
-import {
-    AccessTokenGuard,
-    RefreshTokenGaurd,
-} from 'src/auth/guard/bearer-token.guard';
+import { RefreshTokenGaurd } from 'src/auth/guard/bearer-token.guard';
 import { RegisterUserDto } from 'src/auth/dto/auth-register.dto';
 
 @Controller('auth')

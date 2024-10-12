@@ -91,5 +91,6 @@ npm i @nestjs/jwt
 npm i bcrypt
 npm i --save-dev @types/bcrypt
 npm install class-validator class-transformer
-
+npm i multer @types/multer
+npm i @nestjs/serve-static
 ```

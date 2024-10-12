@@ -1,4 +1,8 @@
-import { ClassSerializerInterceptor, Module } from '@nestjs/common';
+import {
+    BadRequestException,
+    ClassSerializerInterceptor,
+    Module,
+} from '@nestjs/common';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { PostsModule } from './posts/posts.module';
@@ -17,10 +21,22 @@ import {
     ENV_DB_PORT,
     ENV_DB_USERNAME,
 } from 'src/env-keys.const';
+import { ServeStaticModule } from '@nestjs/serve-static';
+import { PUBLIC_FOLDER_PATH } from 'src/common/const/path.const';
 
 @Module({
     imports: [
         PostsModule,
+        //도메인 신경x
+        ServeStaticModule.forRoot({
+            rootPath: PUBLIC_FOLDER_PATH,
+            serveRoot: '/public',
+        }),
+        ServeStaticModule.forRoot({
+            rootPath: PUBLIC_FOLDER_PATH,
+            serveRoot: '/temp',
+        }),
+
         ConfigModule.forRoot({
             envFilePath: '.env',
             isGlobal: true,

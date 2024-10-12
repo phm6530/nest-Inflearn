@@ -1,4 +1,6 @@
-import { IsString } from 'class-validator';
+import { PickType } from '@nestjs/mapped-types';
+import { IsOptional, IsString } from 'class-validator';
+import { PostModel } from 'src/posts/entities/posts.entity';
 
 /**
  * pick Omit 처럼 사용가능
@@ -8,10 +10,26 @@ import { IsString } from 'class-validator';
  *
  */
 
-export class CreatePostDto {
+//해당 로직에서 PickType은 그냥 .. 명시적으로 기재해뒀음.
+//이로직은 합쳐도됨
+export class CreatePostDto extends PickType(PostModel, [
+    'title',
+    'content',
+    'image',
+]) {
     @IsString({ message: 'string 값을 입력해야합니다.' })
     title: string;
 
     @IsString()
     content: string;
+
+    @IsOptional()
+    @IsString()
+    image?: string;
+
+    // @IsString({
+    //     each: true,
+    // })
+    // @IsOptional()
+    // images: string[] = [];
 }

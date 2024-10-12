@@ -87,9 +87,10 @@ export class AuthService {
     //회원가입
     async registerWithEmail(user: RegisterUserDto) {
         const { password } = user;
+
         const hashPassword = await bcrypt.hash(
             password,
-            this.configService.get<string>(ENV_HASH_ROUND),
+            parseInt(this.configService.get<string>(ENV_HASH_ROUND)),
         );
 
         const newUser = await this.userService.createUser({

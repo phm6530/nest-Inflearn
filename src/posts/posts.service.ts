@@ -4,6 +4,8 @@ import {
     NotFoundException,
 } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
+import { promises } from 'fs';
+import { basename, join } from 'path';
 import { CommonService } from 'src/common/common.service';
 import { CreatePostDto } from 'src/posts/dto/create-post.dto';
 import {
@@ -68,7 +70,7 @@ export class PostsService {
     }
 
     async createPost(body: { authorId: number } & CreatePostDto) {
-        const { authorId, title, content } = body;
+        const { authorId, title, content, image } = body;
 
         if (!authorId || !title || !content)
             throw new BadRequestException('누락된 값이 있습니다.');
@@ -79,6 +81,7 @@ export class PostsService {
             },
             title,
             content,
+            image,
             likeCount: 0,
             commentCount: 0,
         });
@@ -114,13 +117,31 @@ export class PostsService {
         return id;
     }
 
+    //public 생성
+    async createPostImage(dto: CreatePostDto) {
+        const tempFIlePath = join(`${process.cwd()}/temp/posts`, dto.image);
+        console.log(tempFIlePath);
+
+        //promises는 void이기때문에 try catch에러 잡아야함
+        try {
+            await promises.access(tempFIlePath);
+        } catch (err) {
+            throw new BadRequestException('존재하지 않는 파일');
+        }
+
+        const filename = basename(tempFIlePath);
+        const newPath = join(`${process.cwd()}/public/posts`, filename);
+
+        await promises.rename(tempFIlePath, newPath);
+    }
+
     async generateRandomPost(userId: number) {
-        console.log(userId);
         for (let i = 0; i < 100; i++) {
             await this.createPost({
                 authorId: userId,
                 title: `임의로 생성한 ${i}번째 제목`,
                 content: `임의로 생성한 ${i}번째 콘텐츠`,
+                // images: [],
             });
         }
         return true;
